@@ -9,24 +9,28 @@ function ReduxComponent(props, context, updater) {
   this._componentWillMount = this.componentWillMount;
 
   this.componentWillMount = function() {
-    // should happen sooner?
-    Object.keys(this.actions).forEach(key => {
-      const method = this.actions[key];
-      this.actions[key] = (...args) => this.context.store.dispatch(method(...args));
-    });
+    if (this.actions) {
+      // should happen sooner?
+      Object.keys(this.actions).forEach(key => {
+        const method = this.actions[key];
+        this.actions[key] = (...args) => this.context.store.dispatch(method(...args));
+      });
+    }
 
-    this.context.store.subscribe(() => {
-      console.log(this.context.store.getState())
+    if (this.appState) {
+      this.context.store.subscribe(() => {
+        console.log(this.context.store.getState())
+        this.setState({
+          ...this.state,
+          ...this.appState(this.context.store.getState()),
+        });
+      })
+
       this.setState({
         ...this.state,
         ...this.appState(this.context.store.getState()),
       });
-    })
-
-    this.setState({
-      ...this.state,
-      ...this.appState(this.context.store.getState()),
-    });
+    }
 
     if (this._componentWillMount) {
       this._componentWillMount();
@@ -48,6 +52,6 @@ Object.defineProperty(ReduxComponent, 'contextTypes', {
 });
 
 
-ReduxComponent.prototype = Component.prototype;
+ReduxComponent.prototype = Object.create(Component.prototype);
 
 export default ReduxComponent;

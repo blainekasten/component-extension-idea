@@ -12,6 +12,11 @@ class App extends Component {
     foo: PropTypes.string,
   };
 
+  constructor(...args) {
+    super(...args);
+    console.log(this.appState);
+  }
+
   appState = (state) => ({
     foo: state.foo,
   });
